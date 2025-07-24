@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 #include <fstream>
+
+#include "gui.h"
 #include "data_src/OSMData.h"
 #include "data_src/OSMVertex.h"
 #include "data_src/OSMEdge.h"
@@ -101,8 +103,15 @@ void styleRoot(GraphAdjList<int, OSMVertex, double>& graph,
 
 int main(int argc, char **argv) {
 
+  //SFML window
+  float width = 1600, height = 1000;
+  sf::RenderWindow window(sf::VideoMode(width, height), "USA Tour Planner", sf::Style::Close);
+
+  gui ui(window, width, height);
+  ui.run();
+
   // Using the BRIDGES API to get data
-  Bridges bridges (1, "uvvhuv", "1135652417622");
+  Bridges bridges (1, "BenN5334", "574789216298");
   bridges.setTitle("Graph : OpenStreetMap Example");
 
   //Getting Data
