@@ -11,12 +11,12 @@ window(window), windowWidth(windowWidth), windowHeight(windowHeight) {
 
 void gui::run() {
     //load font
-    if (!font.loadFromFile("files/bahnschrift.ttf")) {
+    if (!font.loadFromFile("../libraries/files/bahnschrift.ttf")) {
         std::cerr << "Failed to load font!" << std::endl;
         return;
     }
     //background image
-    if (!backgroundTexture.loadFromFile("files/images/statue_of_liberty.png")) {
+    if (!backgroundTexture.loadFromFile("../libraries/files/images/statue_of_liberty.png")) {
         std::cerr << "Failed to load background image!" << std::endl;
         return;
     }
