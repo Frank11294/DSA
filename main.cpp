@@ -120,9 +120,7 @@ int main(int argc, char **argv) {
   //int dest;
 
   DataSource ds (&bridges);
-  OSMData osm_data = ds.getOSMData("Charlotte, North Carolina", "primary");
-  //OSMData osm_data = ds.getOSMData("Charlotte, North Carolina", "secondary");
-  //OSMData osm_data = ds.getOSMData(35.28, -80.8, 35.34, -80.7, "tertiary"); //UNCC Campus
+  OSMData osm_data = ds.getOSMData("Charlotte, North Carolina", "tertiary");
   //OSMData osm_data = ds.getOSMData(39.85, -83.14, 40.12, -82.85, "secondary"); //Columbus, OH
   //OSMData osm_data = ds.getOSMData(39.121, -77.055, 39.208, -76.805); //Baltimore, MD
 

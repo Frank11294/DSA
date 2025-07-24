@@ -1,0 +1,1 @@
+Copied folder freetype.framework here from extlibs to fix link problem

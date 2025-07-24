@@ -9,10 +9,13 @@ if(APPLE)
 
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/curl/include)
 
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/SFML-2.6.0-macOS-clang-arm64/include)
+    link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/SFML-2.6.0-macOS-clang-arm64/lib)
+
     add_executable(Project_3 main.cpp
             gui.cpp
             gui.h)
-    target_link_libraries(Project_3 PRIVATE curl)
+    target_link_libraries(Project_3 PRIVATE curl sfml-system sfml-window sfml-graphics)
 endif()
 
 
