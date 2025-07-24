@@ -26,20 +26,31 @@ void gui::run() {
     float factor_y = windowHeight / static_cast<float>(backgroundTexture.getSize().y);
     backgroundSprite.setScale(factor_x, factor_y);
 
+    //locations
+    ufLocations = {"Reitz Union", "Marston Library", "Ben Hill Griffin Stadium", "Lib West", "MacDinton's"};
+    usLandmarks = {"Statue of Liberty", "Golden Gate Bridge", "Grand Canyon", "Mount Rushmore"};
+
     // Title
     sf::Text title("Select Start and Destination", font, 32);
     title.setStyle(sf::Text::Bold | sf::Text::Underlined);
     title.setFillColor(sf::Color::White);
     setText(title, windowWidth / 2, 50);
+
     // Start label
     sf::Text start("Start", font, 24);
     start.setFillColor(sf::Color::White);
     setText(start, windowWidth / 4, 150);
 
+    sf::Text startValue(ufLocations[startIndex], font, 24);
+    setText(startValue, windowWidth / 4, 180);
+
     // Destination label
     sf::Text end("Destination", font, 24);
     end.setFillColor(sf::Color::White);
     setText(end, windowWidth * 3.0f/4.0f, 150);
+
+    sf::Text destValue(usLandmarks[destIndex], font, 24);
+    setText(destValue, windowWidth * 3/4, 180);
 
     // Visualize Button
     sf::RectangleShape button(sf::Vector2f(200, 50));
@@ -54,19 +65,47 @@ void gui::run() {
             if (event.type == sf::Event::Closed)
                 window.close();
 
-            if (event.type == sf::Event::KeyPressed) {
-                if (event.key.code == sf::Keyboard::Num1) {
-                    std::cout << "Start selected\n";
+            else if (event.type == sf::Event::KeyPressed) {
+                //Press tab to switch between Start and Destination
+                if (event.key.code == sf::Keyboard::Tab) {
+                    selectingStart = !selectingStart; //switching between start and dest
+                    if (selectingStart) {
+                        start.setFillColor(sf::Color::Yellow);
+                        end.setFillColor(sf::Color::White);
+                    }
+                    else {
+                        start.setFillColor(sf::Color::White);
+                        end.setFillColor(sf::Color::Yellow);
+                    }
                     // You can set internal state here
                 }
-                if (event.key.code == sf::Keyboard::Num2) {
-                    std::cout << "Destination selected\n";
+                else if (event.key.code == sf::Keyboard::Left) {
+                    if (selectingStart) {
+                        startIndex = (startIndex -1 + ufLocations.size()) % usLandmarks.size();
+                        startValue.setString(ufLocations[startIndex]);
+                    } else {
+                        destIndex = (destIndex - 1 + usLandmarks.size()) % usLandmarks.size();
+                        destValue.setString(usLandmarks[destIndex]);
+                    }
                 }
-                if (event.key.code == sf::Keyboard::Enter) {
-                    std::cout << "Visualize triggered\n";
-                    // You can call BRIDGES logic later from here
-                    window.close();
+                else if (event.key.code == sf::Keyboard::Right) {
+                    if (selectingStart) {
+                        startIndex = (startIndex + 1) % ufLocations.size();
+                        startValue.setString(ufLocations[startIndex]);
+                    } else {
+                        destIndex = (destIndex + 1) % usLandmarks.size();
+                        destValue.setString(usLandmarks[destIndex]);
+                    }
                 }
+
+                // if (event.key.code == sf::Keyboard::Num2) {
+                //     std::cout << "Destination selected\n";
+                // }
+                // if (event.key.code == sf::Keyboard::Enter) {
+                //     std::cout << "Visualize triggered\n";
+                //     // You can call BRIDGES logic later from here
+                //     window.close();
+                // }
             }
             if (event.type == sf::Event::MouseButtonPressed) {
                 sf::Vector2i position = sf::Mouse::getPosition(window);
@@ -84,7 +123,9 @@ void gui::run() {
 
         window.draw(title);
         window.draw(start);
+        window.draw(startValue);
         window.draw(end);
+        window.draw(destValue);
         window.draw(button);
         window.draw(buttonText);
 
