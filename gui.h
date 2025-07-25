@@ -11,7 +11,6 @@ class gui {
 public:
     gui(sf::RenderWindow& window, float windowWidth, float windowHeight);
     void run();
-    // void isButtonPressed(sf::Event::Event& e);
     float windowWidth;
     float windowHeight;
 

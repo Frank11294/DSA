@@ -69,19 +69,10 @@ void gui::run() {
                 //Press tab to switch between Start and Destination
                 if (event.key.code == sf::Keyboard::Tab) {
                     selectingStart = !selectingStart; //switching between start and dest
-                    if (selectingStart) {
-                        start.setFillColor(sf::Color::Yellow);
-                        end.setFillColor(sf::Color::White);
-                    }
-                    else {
-                        start.setFillColor(sf::Color::White);
-                        end.setFillColor(sf::Color::Yellow);
-                    }
-                    // You can set internal state here
                 }
                 else if (event.key.code == sf::Keyboard::Left) {
                     if (selectingStart) {
-                        startIndex = (startIndex -1 + ufLocations.size()) % usLandmarks.size();
+                        startIndex = (startIndex - 1 + ufLocations.size()) % ufLocations.size();
                         startValue.setString(ufLocations[startIndex]);
                     } else {
                         destIndex = (destIndex - 1 + usLandmarks.size()) % usLandmarks.size();
@@ -98,14 +89,6 @@ void gui::run() {
                     }
                 }
 
-                // if (event.key.code == sf::Keyboard::Num2) {
-                //     std::cout << "Destination selected\n";
-                // }
-                // if (event.key.code == sf::Keyboard::Enter) {
-                //     std::cout << "Visualize triggered\n";
-                //     // You can call BRIDGES logic later from here
-                //     window.close();
-                // }
             }
             if (event.type == sf::Event::MouseButtonPressed) {
                 sf::Vector2i position = sf::Mouse::getPosition(window);
@@ -128,11 +111,20 @@ void gui::run() {
         window.draw(destValue);
         window.draw(button);
         window.draw(buttonText);
+        //To highlight the selected option
+        if (selectingStart) {
+            start.setFillColor(sf::Color::Yellow);
+            end.setFillColor(sf::Color::White);
+        }
+        else {
+            start.setFillColor(sf::Color::White);
+            end.setFillColor(sf::Color::Yellow);
+        }
 
         window.display();
     }
 }
-
+//helper function to center text
 void gui::setText(sf::Text &text, const float x, const float y) {
     const sf::FloatRect textRect = text.getLocalBounds();
     text.setOrigin(textRect.left + textRect.width/2.0f, textRect.top + textRect.height/2.0f);
