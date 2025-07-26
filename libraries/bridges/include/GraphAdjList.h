@@ -329,7 +329,8 @@ namespace bridges {
 						SLelement<Edge<K, E2> > *sle = adj_list.at(src);
 						while (sle) {
 							Edge<K, E2> ed = sle->getValue();
-							if (ed.getVertex() == dest) { //edge exists
+							// following line used to say if (ed.getVertex() == dest) { //edge exists
+							if (ed.to() == dest) { //edge exists
 								return ed.getEdgeData();
 							}
 							sle = sle->getNext();

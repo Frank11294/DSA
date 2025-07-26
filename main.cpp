@@ -52,11 +52,58 @@ void getCenter(const OSMData& osm_data, double& lat, double& lon) {
 }
 
 //actual shortestPath implementation
+// this implementation is based partially on https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/GraphShortest.html
 void shortestPath (const GraphAdjList<int, OSMVertex, double>& gr,
                int source,
                std::unordered_map<int, double>& distance,
                std::unordered_map<int, int>& parent) {
-  //TODO
+  set<int> visited;
+
+  // create a min heap for edges
+  priority_queue<pair<int, double>, vector<pair<int, double>>,
+    function<bool(const pair<int, double>&,const pair<int, double>&)>> pq(
+      [](const pair<int, double>& a, const pair<int, double>&b) {
+    return a.second > b.second;
+  });
+  // initialize the queue with one vertex
+  pq.push(make_pair(source, 0.0));
+
+  // initialize distances to infinity
+  for (auto v : *gr.getVertices()) {
+    distance[v.first] = std::numeric_limits<double>::max();
+    parent[v.first] = -1;
+  }
+
+  distance[source] = 0;
+
+  unsigned long maxVertices = gr.getAdjacencyList().size();
+
+  for (int i = 0; i < maxVertices; i++) {
+    if (pq.empty()){return;} // all remaining vertices are unreachable
+    pair<int, double> p = pq.top();
+    pq.pop();
+    int nearestVertex = p.first;
+    while (visited.find(nearestVertex) != visited.end()) {
+      if (pq.empty()){return;}
+      p = pq.top();
+      pq.pop();
+      nearestVertex = p.first;
+    }
+    visited.insert(nearestVertex);
+    if (distance[nearestVertex] == std::numeric_limits<double>::max()) {return;}
+    auto listPtr = gr.getAdjacencyList(nearestVertex);
+    while (listPtr != nullptr) {
+      // update distances to neighbors of nearestVertex
+      int adjacentVertex = listPtr->getValue().to();
+      double newDistance = distance[nearestVertex] + gr.getEdgeData(nearestVertex, adjacentVertex);
+      if (distance[adjacentVertex] > newDistance) {
+        distance[adjacentVertex]  = newDistance;
+        parent[adjacentVertex] = nearestVertex;
+        pq.push(make_pair(adjacentVertex, distance[adjacentVertex]));
+      }
+      listPtr = listPtr->getNext();
+    }
+  }
 }
 
 //return the vertex the closest to a particular (lat,lon)
@@ -102,14 +149,13 @@ void styleRoot(GraphAdjList<int, OSMVertex, double>& graph,
 }
 
 int main(int argc, char **argv) {
-
   //SFML window
-  float width = 1600, height = 1000;
+  /*float width = 1600, height = 1000;
   sf::RenderWindow window(sf::VideoMode(width, height), "USA Tour Planner", sf::Style::Close);
 
   gui ui(window, width, height);
   ui.run();
-
+*/
   // Using the BRIDGES API to get data
   Bridges bridges (1, "BenN5334", "574789216298");
   bridges.setTitle("Graph : OpenStreetMap Example");
@@ -130,11 +176,12 @@ int main(int argc, char **argv) {
 
   cout << "Data set has " << vertices.size() << " vertices and " << edges.size() << " edges" << endl;
 
+
   GraphAdjList<int, OSMVertex, double> graph;
   osm_data.getGraph (&graph);
   graph.forceLargeVisualization(true);
   bridges.setDataStructure(&graph);
-  bridges.visualize();
+  //bridges.visualize();
 
   //TODO Uncomment for part 2
   // //Getting source vertex (Using center of the map)
@@ -150,9 +197,27 @@ int main(int argc, char **argv) {
 
   //TODO Uncomment for part 3.
   // //Running shortest path
-  // std::unordered_map<int, double> distance;
-  // std::unordered_map<int, int> parent;
-  // shortestPath(graph, closest, distance, parent);
+/*
+  cout << "Adjacency list:" << endl;
+  for (auto e : graph.getAdjacencyList()) {
+    cout << e.first << " ";
+    auto listPtr = graph.getAdjacencyList(e.first);
+    while (listPtr) {
+      cout << listPtr->getValue().to() << " (" << graph.getEdgeData(e.first, listPtr->getValue().to()) << ") ";
+      listPtr = listPtr->getNext();
+    }
+    cout << endl;
+  }*/
+
+  int source = graph.getVertices()->begin()->first;
+  // cout << "source vertex: " << source << endl;
+  std::unordered_map<int, double> distance;
+  std::unordered_map<int, int> parent;
+  shortestPath(graph, source, distance, parent);
+  /*cout << "Vertex Distance Parent" << endl;
+  for (auto v: *graph.getVertices()) {
+    cout << v.first << " " << distance[v.first] << " " << parent[v.first] << endl;
+  }*/
   // //Styling based on distance
   // styleDistance(graph, distance);
   // bridges.visualize();
