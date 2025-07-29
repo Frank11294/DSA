@@ -132,26 +132,35 @@ void styleParent(GraphAdjList<int, OSMVertex, double>& graph,
                  std::unordered_map<int, int>& parent,
                  const int dest
                 ) {
-  //TODO
 
   //set all edges to transparent
+/* (auto edge: graph.getAdjacencyList()) {
+    int vertex = edge.first;
+    if (edge.second == nullptr){continue;}
+    //edgesColored++;
+    int neighbor = edge.second->getValue().to();
+    graph.getEdge(vertex, neighbor).setColor(Color(0,0,0,0));
+  }
 
   //set all vertices to transparent
+  for (auto it = graph.getVertices()->begin(); it != graph.getVertices()->end(); ++it) {
+    it->second->setColor(Color(0,0,0,0));
+  }*/
 
-
-  //for each edge on the SP from source to dest
+  // coloring edges between source and destination
   int currentParent = parent[dest];
   int currentDest = dest;
   graph.getVertex(dest)->setLabel("Destination");
+  graph.getVertex(dest)->setColor(Color(255,0,0,255));
 
   while (currentParent != -1) {
-    auto currentEdge = graph.getEdge(currentParent, currentDest);
-    currentEdge.setColor(Color(255, 50, 50));
-    currentEdge.setThickness(8);
+    graph.getEdge(currentParent, currentDest).setColor(Color(255, 0, 0, 255));
+    graph.getVertex(currentDest)->setColor(Color(255,0,0,255));
     currentDest = currentParent;
     currentParent = parent[currentParent];
   }
   graph.getVertex(currentDest)->setLabel("Source");
+  graph.getVertex(currentDest)->setColor(Color(255,0,0,255));
 }
 
 //change the style of the root of the shortest path
@@ -172,11 +181,6 @@ int main(int argc, char **argv) {
   Bridges bridges (1, "BenN5334", "574789216298");
   bridges.setTitle("Graph : OpenStreetMap Example");
 
-  //Getting Data
-  //int closest;
-  //double latc, lonc;
-  //int dest;
-
   DataSource ds (&bridges);
   OSMData osm_data = ds.getOSMData("Charlotte, North Carolina", "tertiary");
   //OSMData osm_data = ds.getOSMData(39.85, -83.14, 40.12, -82.85, "secondary"); //Columbus, OH
@@ -193,7 +197,6 @@ int main(int argc, char **argv) {
   osm_data.getGraph (&graph);
   graph.forceLargeVisualization(true);
   bridges.setDataStructure(&graph);
-  //bridges.visualize();
 
   //TODO Uncomment for part 2
   // //Getting source vertex (Using center of the map)
@@ -207,41 +210,21 @@ int main(int argc, char **argv) {
   // bridges.visualize();
 
 
-  //TODO Uncomment for part 3.
-  // //Running shortest path
-/*
-  cout << "Adjacency list:" << endl;
-  for (auto e : graph.getAdjacencyList()) {
-    cout << e.first << " ";
-    auto listPtr = graph.getAdjacencyList(e.first);
-    while (listPtr) {
-      cout << listPtr->getValue().to() << " (" << graph.getEdgeData(e.first, listPtr->getValue().to()) << ") ";
-      listPtr = listPtr->getNext();
-    }
-    cout << endl;
-  }*/
-
   // choosing arbitrary source and destination to test visualization
   int source = graph.getVertices()->begin()->first;
   auto ptr = graph.getVertices()->begin();
-  for (int i = 0; i < 100 && i < graph.getVertices()->size(); i++) {ptr++;}
+  for (int i = 0; i < 1001 && i < graph.getVertices()->size(); i++) {ptr++;}
   int dest = ptr->first;
 
-  // cout << "source vertex: " << source << endl;
+  // distance and parent vertex tables for Dijkstra's algorithm
   std::unordered_map<int, double> distance;
   std::unordered_map<int, int> parent;
   shortestPath(graph, source, distance, parent);
-  /*cout << "Vertex Distance Parent" << endl;
-  for (auto v: *graph.getVertices()) {
-    cout << v.first << " " << distance[v.first] << " " << parent[v.first] << endl;
-  }*/
-  //Styling based on distance
-  //styleDistance(graph, distance);
-  // bridges.visualize();
 
-  //TODO Uncomment for part 4
   //styling based on source-destination path
   styleParent(graph, parent, dest);
+
+  bridges.setElementLabelFlag(true);
   bridges.visualize();
 
     return 0;
