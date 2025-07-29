@@ -127,10 +127,10 @@ void styleDistance(GraphAdjList<int, OSMVertex, double> graph,
 }
 
 //style graph based on whether vertices and edges sit on the shortest path between dest and source. (Note that source is not given since all parent pointer chase go there)
-void styleParent(GraphAdjList<int, OSMVertex, double> graph,
-                 const std::unordered_map<int, double>& distance,
-                 const std::unordered_map<int, int>& parent,
-                 int dest
+void styleParent(GraphAdjList<int, OSMVertex, double>& graph,
+                 //const std::unordered_map<int, double>& distance,
+                 std::unordered_map<int, int>& parent,
+                 const int dest
                 ) {
   //TODO
 
@@ -140,6 +140,18 @@ void styleParent(GraphAdjList<int, OSMVertex, double> graph,
 
 
   //for each edge on the SP from source to dest
+  int currentParent = parent[dest];
+  int currentDest = dest;
+  graph.getVertex(dest)->setLabel("Destination");
+
+  while (currentParent != -1) {
+    auto currentEdge = graph.getEdge(currentParent, currentDest);
+    currentEdge.setColor(Color(255, 50, 50));
+    currentEdge.setThickness(8);
+    currentDest = currentParent;
+    currentParent = parent[currentParent];
+  }
+  graph.getVertex(currentDest)->setLabel("Source");
 }
 
 //change the style of the root of the shortest path
@@ -150,12 +162,12 @@ void styleRoot(GraphAdjList<int, OSMVertex, double>& graph,
 
 int main(int argc, char **argv) {
   //SFML window
-  /*float width = 1600, height = 1000;
+  float width = 1600, height = 1000;
   sf::RenderWindow window(sf::VideoMode(width, height), "USA Tour Planner", sf::Style::Close);
 
   gui ui(window, width, height);
   ui.run();
-*/
+
   // Using the BRIDGES API to get data
   Bridges bridges (1, "BenN5334", "574789216298");
   bridges.setTitle("Graph : OpenStreetMap Example");
@@ -209,7 +221,12 @@ int main(int argc, char **argv) {
     cout << endl;
   }*/
 
+  // choosing arbitrary source and destination to test visualization
   int source = graph.getVertices()->begin()->first;
+  auto ptr = graph.getVertices()->begin();
+  for (int i = 0; i < 100 && i < graph.getVertices()->size(); i++) {ptr++;}
+  int dest = ptr->first;
+
   // cout << "source vertex: " << source << endl;
   std::unordered_map<int, double> distance;
   std::unordered_map<int, int> parent;
@@ -218,14 +235,14 @@ int main(int argc, char **argv) {
   for (auto v: *graph.getVertices()) {
     cout << v.first << " " << distance[v.first] << " " << parent[v.first] << endl;
   }*/
-  // //Styling based on distance
-  // styleDistance(graph, distance);
+  //Styling based on distance
+  //styleDistance(graph, distance);
   // bridges.visualize();
 
   //TODO Uncomment for part 4
-  // //styling based on source-destination path
-  // styleParent(graph, distance, parent, dest);
-  // bridges.visualize();
+  //styling based on source-destination path
+  styleParent(graph, parent, dest);
+  bridges.visualize();
 
     return 0;
 }
