@@ -10,6 +10,8 @@ window(window), windowWidth(windowWidth), windowHeight(windowHeight) {
 }
 
 void gui::run() {
+    window.setFramerateLimit(60);
+
     //load font
     if (!font.loadFromFile("../libraries/files/bahnschrift.ttf")) {
         std::cerr << "Failed to load font!" << std::endl;
