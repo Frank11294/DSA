@@ -14,7 +14,9 @@ if(APPLE)
 
     add_executable(Project_3 main.cpp
             gui.cpp
-            gui.h)
+            gui.h
+            routePlanner.cpp
+            routePlanner.h)
     target_link_libraries(Project_3 PRIVATE curl sfml-system sfml-window sfml-graphics)
 endif()
 
@@ -33,6 +35,8 @@ if(WIN32)
 
     add_executable(Project_3 main.cpp
             gui.cpp
-            gui.h)
+            gui.h
+            routePlanner.cpp
+            routePlanner.h)
     target_link_libraries(Project_3 libcurl.lib sfml-system sfml-window sfml-graphics sfml-audio)
 endif()
