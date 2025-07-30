@@ -19,44 +19,13 @@ using namespace bridges;
  * and https://bridgesuncc.github.io/tutorials/Data_OSM.html
  ******************************/
 
-//function used to return the relative distance between doubles.
-//useful to compare for equality
-double RelDif(double a, double b) {
-  double c = std::abs(a);
-  double d = std::abs(b);
-
-  d = (std::max)(c, d);
-
-  return d == 0.0 ? 0.0 : std::abs(a - b) / d;
-}
-
-
-//used to get the coordinate of the (.25,.25) of the map
-void getQuarter(const OSMData& osm_data, double& lat, double& lon) {
-  double latr[2];
-  double lonr[2];
-  osm_data.getLatLongRange(latr, lonr);
-
-  lat = latr[0] + (latr[1] - latr[0]) / 4.;
-  lon = lonr[0] + (lonr[1] - lonr[0]) / 4.;
-}
-
-//used to get the coordinate of the center of the map
-void getCenter(const OSMData& osm_data, double& lat, double& lon) {
-  double latr[2];
-  double lonr[2];
-  osm_data.getLatLongRange(latr, lonr);
-
-  lat = (latr[0] + latr[1]) / 2.;
-  lon = (lonr[0] + lonr[1]) / 2.;
-}
-
-//actual shortestPath implementation
+// Min-heap implementation of Dijkstra's algorithm
 // this implementation is based partially on https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/GraphShortest.html
 void shortestPath (const GraphAdjList<int, OSMVertex, double>& gr,
                int source,
                std::unordered_map<int, double>& distance,
-               std::unordered_map<int, int>& parent) {
+               std::unordered_map<int, int>& parent
+               ) {
   set<int> visited;
 
   // create a min heap for edges
@@ -112,61 +81,21 @@ int getClosestVertex(const GraphAdjList<int, OSMVertex, double>& graph,
   return -1;
 }
 
-//style all vertices based on their distance to the root of the shortest path.
-//style edges based on whether they sit on a shortest path or not
-void styleDistance(GraphAdjList<int, OSMVertex, double> graph,
-                   const std::unordered_map<int, double>& distance) {
-  double maxd = 0.;
-
-  //find max distance (Beware of unreachable vertices with a distance of INFINITY)
-
-
-  //color vertices based on distances
-
-  //optional: style edges if they are shortest path edges. (Beware of back edges)
-}
-
-//style graph based on whether vertices and edges sit on the shortest path between dest and source. (Note that source is not given since all parent pointer chase go there)
-void styleParent(GraphAdjList<int, OSMVertex, double>& graph,
-                 //const std::unordered_map<int, double>& distance,
-                 std::unordered_map<int, int>& parent,
-                 const int dest
-                ) {
-
-  //set all edges to transparent
-/* (auto edge: graph.getAdjacencyList()) {
-    int vertex = edge.first;
-    if (edge.second == nullptr){continue;}
-    //edgesColored++;
-    int neighbor = edge.second->getValue().to();
-    graph.getEdge(vertex, neighbor).setColor(Color(0,0,0,0));
+// generate the list of lat, long pairs needed to plot the route
+void plotRoute(GraphAdjList<int, OSMVertex, double>& graph, std::unordered_map<int, int>& parent, const int dest) {
+  int vertex = dest;
+  bool firstItem = true;
+  cout << "[";
+  while (vertex != -1) {
+    auto vertexPtr = graph.getVertex(vertex);
+    if (!firstItem) {
+      cout << ", ";
+    }
+    firstItem = false;
+    cout << "[" << vertexPtr->getValue().getLatitude() << ", " << vertexPtr->getValue().getLongitude()  << "]";
+    vertex = parent[vertex];
   }
-
-  //set all vertices to transparent
-  for (auto it = graph.getVertices()->begin(); it != graph.getVertices()->end(); ++it) {
-    it->second->setColor(Color(0,0,0,0));
-  }*/
-
-  // coloring edges between source and destination
-  int currentParent = parent[dest];
-  int currentDest = dest;
-  graph.getVertex(dest)->setLabel("Destination");
-  graph.getVertex(dest)->setColor(Color(255,0,0,255));
-
-  while (currentParent != -1) {
-    graph.getEdge(currentParent, currentDest).setColor(Color(255, 0, 0, 255));
-    graph.getVertex(currentDest)->setColor(Color(255,0,0,255));
-    currentDest = currentParent;
-    currentParent = parent[currentParent];
-  }
-  graph.getVertex(currentDest)->setLabel("Source");
-  graph.getVertex(currentDest)->setColor(Color(255,0,0,255));
-}
-
-//change the style of the root of the shortest path
-void styleRoot(GraphAdjList<int, OSMVertex, double>& graph,
-               int root) {
-  //TODO
+  cout << "]" << endl;
 }
 
 int main(int argc, char **argv) {
@@ -195,22 +124,10 @@ int main(int argc, char **argv) {
 
   GraphAdjList<int, OSMVertex, double> graph;
   osm_data.getGraph (&graph);
-  graph.forceLargeVisualization(true);
   bridges.setDataStructure(&graph);
 
-  //TODO Uncomment for part 2
-  // //Getting source vertex (Using center of the map)
-  // getCenter(osm_data, latc, lonc);
-  // closest = getClosestVertex(graph, latc, lonc);
-  // //Getting destination vertex
-  // getQuarter(osm_data, latc, lonc);
-  // dest = getClosestVertex(graph, latc, lonc);
-  // styleRoot(graph, closest);
-  // bridges.setDataStructure(&graph);
-  // bridges.visualize();
-
-
   // choosing arbitrary source and destination to test visualization
+  // TODO: use UI to specify source and destination
   int source = graph.getVertices()->begin()->first;
   auto ptr = graph.getVertices()->begin();
   for (int i = 0; i < 1001 && i < graph.getVertices()->size(); i++) {ptr++;}
@@ -221,11 +138,7 @@ int main(int argc, char **argv) {
   std::unordered_map<int, int> parent;
   shortestPath(graph, source, distance, parent);
 
-  //styling based on source-destination path
-  styleParent(graph, parent, dest);
+  plotRoute(graph, parent, dest);
 
-  bridges.setElementLabelFlag(true);
-  bridges.visualize();
-
-    return 0;
+  return 0;
 }
