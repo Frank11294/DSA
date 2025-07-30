@@ -85,7 +85,7 @@ void routePlanner::plotRoute(const int dest) {
 void routePlanner::generateViz(vector<pair<double, double>>& path) {
     string fileName = "viz.html";
     ofstream file(fileName);
-    string html1 = "<html><head><link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\" integrity=\"sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=\" crossorigin=\"\"/><script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\" integrity=\"sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=\" crossorigin=\"\"></script><title>Route Finding Demo with OpenStreetMap</title></head><body><div id=\"map\" style=\"height: 400px\"></div><script type=\"text/javascript\">var map = L.map('map').setView([0, 0], 13);var latlngs = [";
+    string html1 = R"(<html><head><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script><title>Route Finding Demo with OpenStreetMap</title></head><body><div id="map" style="height: 100%"></div><script type="text/javascript">var map = L.map('map').setView([0, 0], 13);var latlngs = [)";
     string html2 = "];var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);map.fitBounds(polyline.getBounds());L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>'}).addTo(map);</script></body></html>";
     file << html1 << endl;
     bool firstItem = true;

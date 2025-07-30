@@ -18,7 +18,7 @@ public:
   void plotRoute(int dest);
 
 private:
-  void generateViz(vector<pair<double, double>> &path);
+  static void generateViz(vector<pair<double, double>> &path);
   bridges::datastructure::GraphAdjList<int, bridges::dataset::OSMVertex, double>* graph;
   std::unordered_map<int, double> distance;
   std::unordered_map<int, int> parent;
