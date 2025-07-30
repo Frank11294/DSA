@@ -2,6 +2,8 @@
 // Created by j on 7/30/25.
 //
 #include <set>
+#include <string>
+#include <fstream>
 #include "routePlanner.h"
 #include "GraphAdjList.h"
 using namespace bridges;
@@ -70,17 +72,37 @@ void aStar(int dest) {
 
 // generate the list of lat, long pairs needed to plot the route
 void routePlanner::plotRoute(const int dest) {
+    vector<pair<double, double>> path;
     int vertex = dest;
-    bool firstItem = true;
-    cout << "[";
     while (vertex != -1) {
         auto vertexPtr = graph->getVertex(vertex);
-        if (!firstItem) {
-            cout << ", ";
-        }
-        firstItem = false;
-        cout << "[" << vertexPtr->getValue().getLatitude() << ", " << vertexPtr->getValue().getLongitude()  << "]";
+        path.push_back(make_pair(vertexPtr->getValue().getLatitude(), vertexPtr->getValue().getLongitude()));
         vertex = parent[vertex];
     }
-    cout << "]" << endl;
+    generateViz(path);
+}
+
+void routePlanner::generateViz(vector<pair<double, double>>& path) {
+    string fileName = "viz.html";
+    ofstream file(fileName);
+    string html1 = "<html><head><link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\" integrity=\"sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=\" crossorigin=\"\"/><script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\" integrity=\"sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=\" crossorigin=\"\"></script><title>Route Finding Demo with OpenStreetMap</title></head><body><div id=\"map\" style=\"height: 400px\"></div><script type=\"text/javascript\">var map = L.map('map').setView([0, 0], 13);var latlngs = [";
+    string html2 = "];var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);map.fitBounds(polyline.getBounds());L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>'}).addTo(map);</script></body></html>";
+    file << html1 << endl;
+    bool firstItem = true;
+    for (auto pr: path) {
+        if (!firstItem) {file << ", ";}
+        firstItem = false;
+        file << "[" << pr.first << ", " << pr.second << "]";
+    }
+    file << html2 << endl;
+    file.close();
+#ifdef _WIN32
+    ShellExecute(nullptr, "open", fileName.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+#elif defined(__APPLE__)
+    std::string command = "open " + fileName;
+    system(command.c_str());
+#else
+    std::string command = "xdg-open " + fileName;
+    system(command.c_str());
+#endif
 }
