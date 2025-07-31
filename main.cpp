@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
   bridges.setTitle("Graph : OpenStreetMap Example");
 
   DataSource ds (&bridges);
-  OSMData osm_data = ds.getOSMData("Charlotte, North Carolina", "tertiary");
+  OSMData osm_data = ds.getOSMData("New York, New York", "tertiary");
   cout << "Data set has " << osm_data.getVertices().size() << " vertices and " << osm_data.getEdges().size() << " edges" << endl;
 
   GraphAdjList<int, OSMVertex, double> graph;

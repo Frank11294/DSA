@@ -121,8 +121,8 @@ void gui::run() {
                         std::cout << "Visualize triggered" << std::endl;
                         // using some arbitrary latitude and longitude points to demonstrate
                         // todo: need to provide appropriate lat, long from ui selection
-                        int source = routePlannerPtr->vertexFromLatLong(35.30691, -80.8);
-                        int dest = routePlannerPtr->vertexFromLatLong(35.2, -80.8);
+                        int source = routePlannerPtr->vertexFromLatLong(40.719,-74.000);
+                        int dest = routePlannerPtr->vertexFromLatLong(40.793, -73.953);
                         routePlannerPtr->setSrc(source);
                         routePlannerPtr->setDest(dest);
                         routePlannerPtr->dijkstra();
