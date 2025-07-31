@@ -48,13 +48,11 @@ int main(int argc, char **argv) {
 
   // choosing arbitrary source and destination to test visualization
   // TODO: use UI to specify source and destination
-  int source = graph.getVertices()->begin()->first;
-  auto ptr = graph.getVertices()->begin();
-  for (int i = 0; i < 1001 && i < graph.getVertices()->size(); i++) {ptr++;}
-  int dest = ptr->first;
 
   routePlanner rp(&graph);
-    rp.setSrc(source);
+  int source = rp.vertexFromLatLong(35.30691, -80.8);
+  int dest = rp.vertexFromLatLong(35.2, -80.8);
+  rp.setSrc(source);
   rp.setDest(dest);
   rp.dijkstra();
   rp.plotRoute();

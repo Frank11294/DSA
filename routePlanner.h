@@ -13,6 +13,7 @@
 class routePlanner {
 public:
   explicit routePlanner(bridges::datastructure::GraphAdjList<int, bridges::dataset::OSMVertex, double>* graph);
+  int vertexFromLatLong(double lat, double lon);
   void setSrc(int source);
   void setDest(int dest);
   void dijkstra();
