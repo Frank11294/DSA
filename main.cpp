@@ -21,12 +21,6 @@ using namespace bridges;
  ******************************/
 
 int main(int argc, char **argv) {
-  //SFML window
-  float width = 1600, height = 1000;
-  sf::RenderWindow window(sf::VideoMode(width, height), "Route Finding Demo", sf::Style::Close);
-
-  gui ui(window, width, height);
-  ui.run();
 
   // Using the BRIDGES API to get data
   Bridges bridges (1, "BenN5334", "574789216298");
@@ -34,28 +28,21 @@ int main(int argc, char **argv) {
 
   DataSource ds (&bridges);
   OSMData osm_data = ds.getOSMData("Charlotte, North Carolina", "tertiary");
-
-  // How to get edges and vertices from data set
-  vector<OSMVertex> vertices = osm_data.getVertices();
-  vector<OSMEdge> edges = osm_data.getEdges();
-
-  cout << "Data set has " << vertices.size() << " vertices and " << edges.size() << " edges" << endl;
-
+  cout << "Data set has " << osm_data.getVertices().size() << " vertices and " << osm_data.getEdges().size() << " edges" << endl;
 
   GraphAdjList<int, OSMVertex, double> graph;
   osm_data.getGraph (&graph);
   bridges.setDataStructure(&graph);
 
-  // choosing arbitrary source and destination to test visualization
-  // TODO: use UI to specify source and destination
-
   routePlanner rp(&graph);
-  int source = rp.vertexFromLatLong(35.30691, -80.8);
-  int dest = rp.vertexFromLatLong(35.2, -80.8);
-  rp.setSrc(source);
-  rp.setDest(dest);
-  rp.dijkstra();
-  rp.plotRoute();
+
+  //SFML window
+  float width = 1600, height = 1000;
+  sf::RenderWindow window(sf::VideoMode(width, height), "Route Finding Demo", sf::Style::Close);
+
+  gui ui(window, width, height);
+  ui.setRoutePlanner(&rp);
+  ui.run();
 
   return 0;
 }
