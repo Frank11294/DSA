@@ -23,7 +23,7 @@ using namespace bridges;
 int main(int argc, char **argv) {
   //SFML window
   float width = 1600, height = 1000;
-  sf::RenderWindow window(sf::VideoMode(width, height), "USA Tour Planner", sf::Style::Close);
+  sf::RenderWindow window(sf::VideoMode(width, height), "Route Finding Demo", sf::Style::Close);
 
   gui ui(window, width, height);
   ui.run();
@@ -54,8 +54,10 @@ int main(int argc, char **argv) {
   int dest = ptr->first;
 
   routePlanner rp(&graph);
-  rp.dijkstra(source);
-  rp.plotRoute(dest);
+    rp.setSrc(source);
+  rp.setDest(dest);
+  rp.dijkstra();
+  rp.plotRoute();
 
   return 0;
 }

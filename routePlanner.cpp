@@ -13,9 +13,17 @@ routePlanner::routePlanner(datastructure::GraphAdjList<int, dataset::OSMVertex, 
     graph = _graph;
 }
 
+void routePlanner::setSrc(int src) {
+    source = src;
+}
+
+void routePlanner::setDest(int dst) {
+    dest = dst;
+}
+
 // Min-heap implementation of Dijkstra's algorithm
 // this implementation is based on https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/GraphShortest.html
-void routePlanner::dijkstra(int source) {
+void routePlanner::dijkstra() {
     set<int> visited;
 
     // create a min heap for edges
@@ -66,12 +74,12 @@ void routePlanner::dijkstra(int source) {
 }
 
 // A* algorithm
-void aStar(int dest) {
+void aStar(int src, int dest) {
 
 }
 
 // generate the list of lat, long pairs needed to plot the route
-void routePlanner::plotRoute(const int dest) {
+void routePlanner::plotRoute() {
     vector<pair<double, double>> path;
     int vertex = dest;
     while (vertex != -1) {

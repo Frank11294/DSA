@@ -13,15 +13,19 @@
 class routePlanner {
 public:
   explicit routePlanner(bridges::datastructure::GraphAdjList<int, bridges::dataset::OSMVertex, double>* graph);
-  void dijkstra(int source);
-  void aStar(int dest);
-  void plotRoute(int dest);
+  void setSrc(int source);
+  void setDest(int dest);
+  void dijkstra();
+  void aStar();
+  void plotRoute();
 
 private:
   static void generateViz(vector<pair<double, double>> &path);
   bridges::datastructure::GraphAdjList<int, bridges::dataset::OSMVertex, double>* graph;
   std::unordered_map<int, double> distance;
   std::unordered_map<int, int> parent;
+  int source = 0;
+  int dest = 0;
 };
 
 
