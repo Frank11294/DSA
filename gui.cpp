@@ -4,6 +4,7 @@
 
 #include "gui.h"
 #include <iostream>
+#include <chrono>
 
 gui::gui(sf::RenderWindow& window, float windowWidth, float windowHeight):
 window(window), windowWidth(windowWidth), windowHeight(windowHeight) {
@@ -32,38 +33,47 @@ void gui::run() {
     float factor_y = windowHeight / static_cast<float>(backgroundTexture.getSize().y);
     backgroundSprite.setScale(factor_x, factor_y);
 
-    //locations
-    //ufLocations = {"Reitz Union", "Marston Library", "Ben Hill Griffin Stadium", "Lib West", "MacDinton's"};
-    //usLandmarks = {"Statue of Liberty", "Golden Gate Bridge", "Grand Canyon", "Mount Rushmore"};
-
     // Title
     sf::Text title("Select Start and Destination", font, 32);
     title.setStyle(sf::Text::Bold | sf::Text::Underlined);
     title.setFillColor(sf::Color::White);
     setText(title, windowWidth / 2, 50);
 
-    // Start label
-    sf::Text start("Start", font, 24);
-    start.setFillColor(sf::Color::White);
-    setText(start, windowWidth / 4, 150);
+    // Start
+    sf::Text startLabel("Start", font, 24);
+    startLabel.setFillColor(sf::Color::White);
+    setText(startLabel, windowWidth / 4, 150);
 
     sf::Text startValue(routePlannerPtr->locations[startIndex].name, font, 24);
     setText(startValue, windowWidth / 4, 180);
 
-    // Destination label
-    sf::Text end("Destination", font, 24);
-    end.setFillColor(sf::Color::White);
-    setText(end, windowWidth * 3.0f/4.0f, 150);
+    // Destination
+    sf::Text destLabel("Destination", font, 24);
+    destLabel.setFillColor(sf::Color::White);
+    setText(destLabel, windowWidth * 3.0f/4.0f, 150);
 
     sf::Text destValue(routePlannerPtr->locations[destIndex].name, font, 24);
     setText(destValue, windowWidth * 3/4, 180);
 
+    // Algorithm
+    sf::Text algorithmLabel("Algorithm", font, 24);
+    algorithmLabel.setFillColor(sf::Color::White);
+    setText(algorithmLabel, windowWidth / 4, 300);
+
+    sf::Text algorithmValue("Dijkstra", font, 24);
+    setText(algorithmValue, windowWidth / 4, 325);
+
     // Visualize Button
-    sf::RectangleShape button(sf::Vector2f(200, 50));
-    button.setFillColor(sf::Color::Blue);
-    button.setPosition(windowWidth / 2 - 100, 300);
+    sf::RectangleShape visualizeButton(sf::Vector2f(200, 50));
+    visualizeButton.setFillColor(sf::Color::Blue);
+    visualizeButton.setPosition(windowWidth * 3/4 - 100, 300);
     sf::Text buttonText("Visualize", font, 20);
-    setText(buttonText, windowWidth / 2, 325);
+    setText(buttonText, windowWidth * 3/4, 325);
+
+    // Instructions
+    sf::Text instr("Instructions: Use TAB to select field; use right and left arrow keys to change", font, 24);
+    instr.setFillColor(sf::Color::White);
+    setText(instr, windowWidth / 2, 950);
 
     while (window.isOpen()) {
         sf::Event event{};
@@ -74,28 +84,42 @@ void gui::run() {
             else if (event.type == sf::Event::KeyPressed) {
                 //Press tab to switch between Start and Destination
                 if (event.key.code == sf::Keyboard::Tab) {
-                    selectingStart = !selectingStart; //switching between start and dest
+                    fieldSelection = (fieldSelection + 1) % 3; //switching fields
                 }
                 else if (event.key.code == sf::Keyboard::Left) {
-                    if (selectingStart) {
+                    if (fieldSelection == 0) {
                         startIndex = (startIndex - 1) % routePlannerPtr->locations.size();
                         while (startIndex == destIndex){startIndex = (startIndex - 1) % routePlannerPtr->locations.size();}
                         startValue.setString(routePlannerPtr->locations[startIndex].name);
-                    } else {
+                    } else if (fieldSelection == 1) {
                         destIndex = (destIndex - 1) % routePlannerPtr->locations.size();
                         while (startIndex == destIndex){destIndex = (destIndex - 1) % routePlannerPtr->locations.size();}
                         destValue.setString(routePlannerPtr->locations[destIndex].name);
+                    } else if (fieldSelection == 2) {
+                        useDijkstra = !useDijkstra;
+                        if (useDijkstra) {
+                            algorithmValue.setString("Dijkstra");
+                        } else {
+                            algorithmValue.setString("A*");
+                        }
                     }
                 }
                 else if (event.key.code == sf::Keyboard::Right) {
-                    if (selectingStart) {
+                    if (fieldSelection == 0) {
                         startIndex = (startIndex + 1) % routePlannerPtr->locations.size();
                         while (startIndex == destIndex){startIndex = (startIndex + 1) % routePlannerPtr->locations.size();}
                         startValue.setString(routePlannerPtr->locations[startIndex].name);
-                    } else {
+                    } else if (fieldSelection == 1) {
                         destIndex = (destIndex + 1) % routePlannerPtr->locations.size();
                         while (startIndex == destIndex){destIndex = (destIndex + 1) % routePlannerPtr->locations.size();}
                         destValue.setString(routePlannerPtr->locations[destIndex].name);
+                    } else if (fieldSelection == 2) {
+                        useDijkstra = !useDijkstra;
+                        if (useDijkstra) {
+                            algorithmValue.setString("Dijkstra");
+                        } else {
+                            algorithmValue.setString("A*");
+                        }
                     }
                 }
 
@@ -103,15 +127,23 @@ void gui::run() {
             if (event.type == sf::Event::MouseButtonPressed) {
                 sf::Vector2i position = sf::Mouse::getPosition(window);
                 if (event.mouseButton.button == sf::Mouse::Left) {
-                    if (button.getGlobalBounds().contains(static_cast<float>(position.x), static_cast<float>(position.y))) {
+                    if (visualizeButton.getGlobalBounds().contains(static_cast<float>(position.x), static_cast<float>(position.y))) {
                         //logic to go to link
-                        std::cout << "Visualize triggered" << std::endl;
                         int source = routePlannerPtr->vertexFromLatLong(routePlannerPtr->locations[startIndex].latitude, routePlannerPtr->locations[startIndex].longitude);
                         int dest = routePlannerPtr->vertexFromLatLong(routePlannerPtr->locations[destIndex].latitude, routePlannerPtr->locations[destIndex].longitude);
                         routePlannerPtr->setSrc(source);
                         routePlannerPtr->setDest(dest);
-                        //routePlannerPtr->dijkstra();
-                        routePlannerPtr->aStar();
+                        auto clock_start = chrono::high_resolution_clock::now();
+                        if (useDijkstra) {
+                            cout << "Using Dijkstra's algorithm." << endl;
+                            routePlannerPtr->dijkstra();
+                        } else {
+                            cout << "Using A* algorithm." << endl;
+                            routePlannerPtr->aStar();
+                        };
+                        auto clock_end = chrono::high_resolution_clock::now();
+                        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(clock_end - clock_start);
+                        std::cout << "Route finding algorithm took " << elapsed.count() << " milliseconds" << std::endl;
                         routePlannerPtr->plotRoute();
                     }
                 }
@@ -122,20 +154,29 @@ void gui::run() {
         window.draw(backgroundSprite);
 
         window.draw(title);
-        window.draw(start);
+        window.draw(startLabel);
         window.draw(startValue);
-        window.draw(end);
+        window.draw(destLabel);
         window.draw(destValue);
-        window.draw(button);
+        window.draw(algorithmLabel);
+        window.draw(algorithmValue);
+        window.draw(instr);
+        window.draw(visualizeButton);
         window.draw(buttonText);
         //To highlight the selected option
-        if (selectingStart) {
-            start.setFillColor(sf::Color::Yellow);
-            end.setFillColor(sf::Color::White);
+        if (fieldSelection == 0) {
+            startLabel.setFillColor(sf::Color::Yellow);
+            destLabel.setFillColor(sf::Color::White);
+            algorithmLabel.setFillColor(sf::Color::White);
         }
-        else {
-            start.setFillColor(sf::Color::White);
-            end.setFillColor(sf::Color::Yellow);
+        else if (fieldSelection == 1) {
+            startLabel.setFillColor(sf::Color::White);
+            destLabel.setFillColor(sf::Color::Yellow);
+            algorithmLabel.setFillColor(sf::Color::White);
+        } else if (fieldSelection == 2) {
+            startLabel.setFillColor(sf::Color::White);
+            destLabel.setFillColor(sf::Color::White);
+            algorithmLabel.setFillColor(sf::Color::Yellow);
         }
 
         window.display();

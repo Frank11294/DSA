@@ -27,7 +27,8 @@ private:
     sf::Text welcome_text;
     int startIndex = 0;
     int destIndex = 1;
-    bool selectingStart = true;
+    bool useDijkstra = true;
+    int fieldSelection = 0;
     routePlanner* routePlannerPtr;
 };
 

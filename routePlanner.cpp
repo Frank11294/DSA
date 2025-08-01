@@ -105,6 +105,7 @@ void routePlanner::dijkstra() {
                 parent[adjacentVertex] = nearestVertex;
                 pq.push(make_pair(adjacentVertex, distance[adjacentVertex]));
             }
+            if (adjacentVertex == dest){return;}
             listPtr = listPtr->getNext();
         }
     }
