@@ -6,10 +6,13 @@
 #define GUI_H
 #include <SFML/Graphics.hpp>
 
+#include "routePlanner.h"
+
 
 class gui {
 public:
     gui(sf::RenderWindow& window, float windowWidth, float windowHeight);
+    void setRoutePlanner(routePlanner* routePlanner);
     void run();
     float windowWidth;
     float windowHeight;
@@ -27,6 +30,7 @@ private:
     int startIndex = 0;
     int destIndex = 0;
     bool selectingStart = true;
+    routePlanner* routePlannerPtr;
 };
 
 

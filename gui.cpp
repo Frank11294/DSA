@@ -9,7 +9,13 @@ gui::gui(sf::RenderWindow& window, float windowWidth, float windowHeight):
 window(window), windowWidth(windowWidth), windowHeight(windowHeight) {
 }
 
+void gui::setRoutePlanner(routePlanner *routePlanner) {
+    routePlannerPtr = routePlanner;
+}
+
 void gui::run() {
+    window.setFramerateLimit(60);
+
     //load font
     if (!font.loadFromFile("../libraries/files/bahnschrift.ttf")) {
         std::cerr << "Failed to load font!" << std::endl;
@@ -96,6 +102,14 @@ void gui::run() {
                     if (button.getGlobalBounds().contains(static_cast<float>(position.x), static_cast<float>(position.y))) {
                         //logic to go to link
                         std::cout << "Visualize triggered" << std::endl;
+                        // using some arbitrary latitude and longitude points to demonstrate
+                        // todo: need to provide appropriate lat, long from ui selection
+                        int source = routePlannerPtr->vertexFromLatLong(40.719,-74.000);
+                        int dest = routePlannerPtr->vertexFromLatLong(40.793, -73.953);
+                        routePlannerPtr->setSrc(source);
+                        routePlannerPtr->setDest(dest);
+                        routePlannerPtr->dijkstra();
+                        routePlannerPtr->plotRoute();
                     }
                 }
             }
