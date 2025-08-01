@@ -6,6 +6,11 @@
 #include <fstream>
 #include "routePlanner.h"
 #include "GraphAdjList.h"
+
+#include <queue>
+#include <functional>
+#include <cmath>
+#include <windows.h>
 using namespace bridges;
 using namespace std;
 
