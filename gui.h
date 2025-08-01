@@ -24,7 +24,6 @@ private:
     sf::Font font;
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
-    sf::Text welcome_text;
     int startIndex = 0;
     int destIndex = 1;
     bool useDijkstra = true;

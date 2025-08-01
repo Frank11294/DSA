@@ -2,12 +2,12 @@
 // Created by BenN5 on 7/16/2025.
 //
 
-#include "gui.h"
 #include <iostream>
 #include <chrono>
+#include "gui.h"
 
-gui::gui(sf::RenderWindow& window, float windowWidth, float windowHeight):
-window(window), windowWidth(windowWidth), windowHeight(windowHeight) {
+gui::gui(sf::RenderWindow &window, float windowWidth, float windowHeight): window(window), windowWidth(windowWidth),
+                                                                           windowHeight(windowHeight) {
 }
 
 void gui::setRoutePlanner(routePlanner *routePlanner) {
@@ -22,6 +22,7 @@ void gui::run() {
         std::cerr << "Failed to load font!" << std::endl;
         return;
     }
+
     //background image
     if (!backgroundTexture.loadFromFile("../libraries/files/images/statue_of_liberty.png")) {
         std::cerr << "Failed to load background image!" << std::endl;
@@ -50,10 +51,10 @@ void gui::run() {
     // Destination
     sf::Text destLabel("Destination", font, 24);
     destLabel.setFillColor(sf::Color::White);
-    setText(destLabel, windowWidth * 3.0f/4.0f, 150);
+    setText(destLabel, windowWidth * 3.0f / 4.0f, 150);
 
     sf::Text destValue(routePlannerPtr->locations[destIndex].name, font, 24);
-    setText(destValue, windowWidth * 3/4, 180);
+    setText(destValue, windowWidth * 3 / 4, 180);
 
     // Algorithm
     sf::Text algorithmLabel("Algorithm", font, 24);
@@ -66,14 +67,14 @@ void gui::run() {
     // Visualize Button
     sf::RectangleShape visualizeButton(sf::Vector2f(200, 50));
     visualizeButton.setFillColor(sf::Color::Blue);
-    visualizeButton.setPosition(windowWidth * 3/4 - 100, 300);
+    visualizeButton.setPosition(windowWidth * 3 / 4 - 100, 300);
     sf::Text buttonText("Visualize", font, 20);
-    setText(buttonText, windowWidth * 3/4, 325);
+    setText(buttonText, windowWidth * 3 / 4, 325);
 
     // Instructions
-    sf::Text instr("Instructions: Use TAB to select field; use right and left arrow keys to change", font, 24);
-    instr.setFillColor(sf::Color::White);
-    setText(instr, windowWidth / 2, 950);
+    sf::Text instructionsText("Use TAB to select field; use right and left arrow keys to change.", font, 24);
+    instructionsText.setFillColor(sf::Color::White);
+    setText(instructionsText, windowWidth / 2, 950);
 
     while (window.isOpen()) {
         sf::Event event{};
@@ -85,15 +86,18 @@ void gui::run() {
                 //Press tab to switch between Start and Destination
                 if (event.key.code == sf::Keyboard::Tab) {
                     fieldSelection = (fieldSelection + 1) % 3; //switching fields
-                }
-                else if (event.key.code == sf::Keyboard::Left) {
+                } else if (event.key.code == sf::Keyboard::Left) {
                     if (fieldSelection == 0) {
                         startIndex = (startIndex - 1) % routePlannerPtr->locations.size();
-                        while (startIndex == destIndex){startIndex = (startIndex - 1) % routePlannerPtr->locations.size();}
+                        while (startIndex == destIndex) {
+                            startIndex = (startIndex - 1) % routePlannerPtr->locations.size();
+                        }
                         startValue.setString(routePlannerPtr->locations[startIndex].name);
                     } else if (fieldSelection == 1) {
                         destIndex = (destIndex - 1) % routePlannerPtr->locations.size();
-                        while (startIndex == destIndex){destIndex = (destIndex - 1) % routePlannerPtr->locations.size();}
+                        while (startIndex == destIndex) {
+                            destIndex = (destIndex - 1) % routePlannerPtr->locations.size();
+                        }
                         destValue.setString(routePlannerPtr->locations[destIndex].name);
                     } else if (fieldSelection == 2) {
                         useDijkstra = !useDijkstra;
@@ -103,15 +107,18 @@ void gui::run() {
                             algorithmValue.setString("A*");
                         }
                     }
-                }
-                else if (event.key.code == sf::Keyboard::Right) {
+                } else if (event.key.code == sf::Keyboard::Right) {
                     if (fieldSelection == 0) {
                         startIndex = (startIndex + 1) % routePlannerPtr->locations.size();
-                        while (startIndex == destIndex){startIndex = (startIndex + 1) % routePlannerPtr->locations.size();}
+                        while (startIndex == destIndex) {
+                            startIndex = (startIndex + 1) % routePlannerPtr->locations.size();
+                        }
                         startValue.setString(routePlannerPtr->locations[startIndex].name);
                     } else if (fieldSelection == 1) {
                         destIndex = (destIndex + 1) % routePlannerPtr->locations.size();
-                        while (startIndex == destIndex){destIndex = (destIndex + 1) % routePlannerPtr->locations.size();}
+                        while (startIndex == destIndex) {
+                            destIndex = (destIndex + 1) % routePlannerPtr->locations.size();
+                        }
                         destValue.setString(routePlannerPtr->locations[destIndex].name);
                     } else if (fieldSelection == 2) {
                         useDijkstra = !useDijkstra;
@@ -122,15 +129,18 @@ void gui::run() {
                         }
                     }
                 }
-
             }
             if (event.type == sf::Event::MouseButtonPressed) {
                 sf::Vector2i position = sf::Mouse::getPosition(window);
                 if (event.mouseButton.button == sf::Mouse::Left) {
-                    if (visualizeButton.getGlobalBounds().contains(static_cast<float>(position.x), static_cast<float>(position.y))) {
+                    if (visualizeButton.getGlobalBounds().contains(static_cast<float>(position.x),
+                                                                   static_cast<float>(position.y))) {
                         //logic to go to link
-                        int source = routePlannerPtr->vertexFromLatLong(routePlannerPtr->locations[startIndex].latitude, routePlannerPtr->locations[startIndex].longitude);
-                        int dest = routePlannerPtr->vertexFromLatLong(routePlannerPtr->locations[destIndex].latitude, routePlannerPtr->locations[destIndex].longitude);
+                        int source = routePlannerPtr->vertexFromLatLong(routePlannerPtr->locations[startIndex].latitude,
+                                                                        routePlannerPtr->locations[startIndex].
+                                                                        longitude);
+                        int dest = routePlannerPtr->vertexFromLatLong(routePlannerPtr->locations[destIndex].latitude,
+                                                                      routePlannerPtr->locations[destIndex].longitude);
                         routePlannerPtr->setSrc(source);
                         routePlannerPtr->setDest(dest);
                         auto clock_start = chrono::high_resolution_clock::now();
@@ -143,7 +153,7 @@ void gui::run() {
                         };
                         auto clock_end = chrono::high_resolution_clock::now();
                         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(clock_end - clock_start);
-                        std::cout << "Route finding algorithm took " << elapsed.count() << " milliseconds" << std::endl;
+                        std::cout << "Route finding algorithm took " << elapsed.count() << " milliseconds." << std::endl;
                         routePlannerPtr->plotRoute();
                     }
                 }
@@ -160,16 +170,16 @@ void gui::run() {
         window.draw(destValue);
         window.draw(algorithmLabel);
         window.draw(algorithmValue);
-        window.draw(instr);
+        window.draw(instructionsText);
         window.draw(visualizeButton);
         window.draw(buttonText);
+
         //To highlight the selected option
         if (fieldSelection == 0) {
             startLabel.setFillColor(sf::Color::Yellow);
             destLabel.setFillColor(sf::Color::White);
             algorithmLabel.setFillColor(sf::Color::White);
-        }
-        else if (fieldSelection == 1) {
+        } else if (fieldSelection == 1) {
             startLabel.setFillColor(sf::Color::White);
             destLabel.setFillColor(sf::Color::Yellow);
             algorithmLabel.setFillColor(sf::Color::White);
@@ -182,9 +192,10 @@ void gui::run() {
         window.display();
     }
 }
+
 //helper function to center text
 void gui::setText(sf::Text &text, const float x, const float y) {
     const sf::FloatRect textRect = text.getLocalBounds();
-    text.setOrigin(textRect.left + textRect.width/2.0f, textRect.top + textRect.height/2.0f);
+    text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
     text.setPosition(sf::Vector2f(x, y));
 }
