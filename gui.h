@@ -24,12 +24,10 @@ private:
     sf::Font font;
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
-    sf::Text welcome_text;
-    std::vector<std::string> ufLocations;
-    std::vector<std::string> usLandmarks;
     int startIndex = 0;
-    int destIndex = 0;
-    bool selectingStart = true;
+    int destIndex = 1;
+    bool useDijkstra = true;
+    int fieldSelection = 0;
     routePlanner* routePlannerPtr;
 };
 
