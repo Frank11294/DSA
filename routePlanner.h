@@ -11,6 +11,13 @@
 
 
 class routePlanner {
+  struct namedLocation {
+    namedLocation(string name, double latitude, double longitude);
+    string name;
+    double latitude;
+    double longitude;
+  };
+
 public:
   explicit routePlanner(bridges::datastructure::GraphAdjList<int, bridges::dataset::OSMVertex, double>* graph);
   int vertexFromLatLong(double lat, double lon);
@@ -19,6 +26,7 @@ public:
   void dijkstra();
   void aStar();
   void plotRoute();
+  vector<namedLocation> locations;
 
 private:
   static void generateViz(vector<pair<double, double>> &path);

@@ -25,10 +25,8 @@ private:
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
     sf::Text welcome_text;
-    std::vector<std::string> ufLocations;
-    std::vector<std::string> usLandmarks;
     int startIndex = 0;
-    int destIndex = 0;
+    int destIndex = 1;
     bool selectingStart = true;
     routePlanner* routePlannerPtr;
 };

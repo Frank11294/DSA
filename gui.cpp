@@ -33,8 +33,8 @@ void gui::run() {
     backgroundSprite.setScale(factor_x, factor_y);
 
     //locations
-    ufLocations = {"Reitz Union", "Marston Library", "Ben Hill Griffin Stadium", "Lib West", "MacDinton's"};
-    usLandmarks = {"Statue of Liberty", "Golden Gate Bridge", "Grand Canyon", "Mount Rushmore"};
+    //ufLocations = {"Reitz Union", "Marston Library", "Ben Hill Griffin Stadium", "Lib West", "MacDinton's"};
+    //usLandmarks = {"Statue of Liberty", "Golden Gate Bridge", "Grand Canyon", "Mount Rushmore"};
 
     // Title
     sf::Text title("Select Start and Destination", font, 32);
@@ -47,7 +47,7 @@ void gui::run() {
     start.setFillColor(sf::Color::White);
     setText(start, windowWidth / 4, 150);
 
-    sf::Text startValue(ufLocations[startIndex], font, 24);
+    sf::Text startValue(routePlannerPtr->locations[startIndex].name, font, 24);
     setText(startValue, windowWidth / 4, 180);
 
     // Destination label
@@ -55,7 +55,7 @@ void gui::run() {
     end.setFillColor(sf::Color::White);
     setText(end, windowWidth * 3.0f/4.0f, 150);
 
-    sf::Text destValue(usLandmarks[destIndex], font, 24);
+    sf::Text destValue(routePlannerPtr->locations[destIndex].name, font, 24);
     setText(destValue, windowWidth * 3/4, 180);
 
     // Visualize Button
@@ -78,20 +78,24 @@ void gui::run() {
                 }
                 else if (event.key.code == sf::Keyboard::Left) {
                     if (selectingStart) {
-                        startIndex = (startIndex - 1 + ufLocations.size()) % ufLocations.size();
-                        startValue.setString(ufLocations[startIndex]);
+                        startIndex = (startIndex - 1) % routePlannerPtr->locations.size();
+                        while (startIndex == destIndex){startIndex = (startIndex - 1) % routePlannerPtr->locations.size();}
+                        startValue.setString(routePlannerPtr->locations[startIndex].name);
                     } else {
-                        destIndex = (destIndex - 1 + usLandmarks.size()) % usLandmarks.size();
-                        destValue.setString(usLandmarks[destIndex]);
+                        destIndex = (destIndex - 1) % routePlannerPtr->locations.size();
+                        while (startIndex == destIndex){destIndex = (destIndex - 1) % routePlannerPtr->locations.size();}
+                        destValue.setString(routePlannerPtr->locations[destIndex].name);
                     }
                 }
                 else if (event.key.code == sf::Keyboard::Right) {
                     if (selectingStart) {
-                        startIndex = (startIndex + 1) % ufLocations.size();
-                        startValue.setString(ufLocations[startIndex]);
+                        startIndex = (startIndex + 1) % routePlannerPtr->locations.size();
+                        while (startIndex == destIndex){startIndex = (startIndex + 1) % routePlannerPtr->locations.size();}
+                        startValue.setString(routePlannerPtr->locations[startIndex].name);
                     } else {
-                        destIndex = (destIndex + 1) % usLandmarks.size();
-                        destValue.setString(usLandmarks[destIndex]);
+                        destIndex = (destIndex + 1) % routePlannerPtr->locations.size();
+                        while (startIndex == destIndex){destIndex = (destIndex + 1) % routePlannerPtr->locations.size();}
+                        destValue.setString(routePlannerPtr->locations[destIndex].name);
                     }
                 }
 
@@ -102,13 +106,12 @@ void gui::run() {
                     if (button.getGlobalBounds().contains(static_cast<float>(position.x), static_cast<float>(position.y))) {
                         //logic to go to link
                         std::cout << "Visualize triggered" << std::endl;
-                        // using some arbitrary latitude and longitude points to demonstrate
-                        // todo: need to provide appropriate lat, long from ui selection
-                        int source = routePlannerPtr->vertexFromLatLong(40.719,-74.000);
-                        int dest = routePlannerPtr->vertexFromLatLong(40.793, -73.953);
+                        int source = routePlannerPtr->vertexFromLatLong(routePlannerPtr->locations[startIndex].latitude, routePlannerPtr->locations[startIndex].longitude);
+                        int dest = routePlannerPtr->vertexFromLatLong(routePlannerPtr->locations[destIndex].latitude, routePlannerPtr->locations[destIndex].longitude);
                         routePlannerPtr->setSrc(source);
                         routePlannerPtr->setDest(dest);
-                        routePlannerPtr->dijkstra();
+                        //routePlannerPtr->dijkstra();
+                        routePlannerPtr->aStar();
                         routePlannerPtr->plotRoute();
                     }
                 }
