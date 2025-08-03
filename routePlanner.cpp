@@ -122,7 +122,7 @@ void routePlanner::aStar() {
     struct Node {
         int vertex;
         double fCost; // (f = g + h)
-        bool operator>(const Node& other) const {
+        bool operator>(const Node& other) const { // Comparing the Cost of two the Node  and returns true if the current  cost is greater than the other object's fCost.
             return fCost > other.fCost;
         }
     };
