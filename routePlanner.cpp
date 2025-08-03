@@ -119,62 +119,71 @@ void routePlanner::dijkstra() {
 
 // A* algorithm
 void routePlanner::aStar() {
+    struct Node {
+        int vertex;
+        double fCost; // (f = g + h)
+        bool operator>(const Node& other) const {
+            return fCost > other.fCost;
+        }
+    };
+
     set<int> visited;
     parent.clear();
     distance.clear();
 
-    // create a min heap for edges
-    priority_queue<pair<int, double>, vector<pair<int, double> >,
-        function<bool(const pair<int, double> &, const pair<int, double> &)> > pq(
-        [](const pair<int, double> &a, const pair<int, double> &b) {
-            return a.second > b.second;
-        });
-    // initialize the queue with one vertex
-    pq.push(make_pair(source, 0.0));
+    // heap priority queue  f(n)
+    priority_queue<Node, vector<Node>, greater<Node>> pq;
 
     // initialize distances to infinity
-    for (auto v: *graph->getVertices()) {
-        distance[v.first] = std::numeric_limits<double>::max();
+    for (const auto& v : *graph->getVertices()) {
+        distance[v.first] = numeric_limits<double>::max();
         parent[v.first] = -1;
     }
 
     distance[source] = 0;
+    pq.push({source, 0.0});
 
-    unsigned long maxVertices = graph->getAdjacencyList().size();
-
-    for (int i = 0; i < maxVertices; i++) {
-        if (pq.empty()) { return; } // all remaining vertices are unreachable
-        pair<int, double> p = pq.top();
+    while (!pq.empty()) {
+        int current = pq.top().vertex;
         pq.pop();
-        int bestVertex = p.first;
-        while (visited.find(bestVertex) != visited.end()) {
-            if (pq.empty()) { return; }
-            p = pq.top();
-            pq.pop();
-            bestVertex = p.first;
-        }
-        visited.insert(bestVertex);
-        if (distance[bestVertex] == std::numeric_limits<double>::max()) { return; }
-        auto listPtr = graph->getAdjacencyList(bestVertex);
+
+        if (visited.find(current) != visited.end())
+            continue;
+
+        visited.insert(current);
+
+        if (current == dest)
+            break;
+
+        auto listPtr = graph->getAdjacencyList(current);
         while (listPtr != nullptr) {
-            // update distances to neighbors of bestVertex
-            int adjacentVertex = listPtr->getValue().to();
-            double newDistance = distance[bestVertex] + graph->getEdgeData(bestVertex, adjacentVertex);
-            if (distance[adjacentVertex] > newDistance) {
-                distance[adjacentVertex] = newDistance;
-                parent[adjacentVertex] = bestVertex;
-                double latDiff = graph->getVertex(listPtr->getValue().from())->getValue().getLatitude() - graph->
-                                 getVertex(listPtr->getValue().to())->getValue().getLatitude();
-                double longDiff = graph->getVertex(listPtr->getValue().from())->getValue().getLongitude() - graph->
-                                  getVertex(listPtr->getValue().to())->getValue().getLongitude();
-                double estTotalDistToDest = newDistance + 10000 * sqrt(latDiff * latDiff + longDiff * longDiff);
-                pq.push(make_pair(adjacentVertex, estTotalDistToDest));
+            int neighbor = listPtr->getValue().to();
+            double weight = graph->getEdgeData(current, neighbor);
+            double tentative_g = distance[current] + weight;
+
+            if (tentative_g < distance[neighbor]) {
+                distance[neighbor] = tentative_g;
+                parent[neighbor] = current;
+
+                // heuristic: straight-line distance to our destination
+                double h = 0.0;
+                double destLat = graph->getVertex(dest)->getValue().getLatitude();
+                double destLong = graph->getVertex(dest)->getValue().getLongitude();
+                double nLat = graph->getVertex(neighbor)->getValue().getLatitude();
+                double nLong = graph->getVertex(neighbor)->getValue().getLongitude();
+                double latDiff = destLat - nLat;
+                double longDiff = destLong - nLong;
+                h = 10000 * sqrt(latDiff * latDiff + longDiff * longDiff);
+
+                pq.push({neighbor, tentative_g + h});
             }
-            if (adjacentVertex == dest) { return; }
+
             listPtr = listPtr->getNext();
         }
     }
 }
+
+
 
 // generate the list of lat, long pairs needed to plot the route
 void routePlanner::plotRoute() {
