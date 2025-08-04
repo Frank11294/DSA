@@ -2,12 +2,14 @@
 // Created by BenN5 on 7/16/2025.
 //
 
+//
+// Created by BenN5 on 7/16/2025.
+//
+
 #ifndef GUI_H
 #define GUI_H
 #include <SFML/Graphics.hpp>
-
 #include "routePlanner.h"
-
 
 class gui {
 public:
@@ -18,6 +20,9 @@ public:
     float windowHeight;
 
 private:
+    enum AlgorithmType { DIJKSTRA, ASTAR, BELLMAN_FORD };
+    AlgorithmType selectedAlgo = DIJKSTRA;
+
     static void setText(sf::Text &text, float x, float y);
     sf::RenderWindow& window;
     sf::Text text;
@@ -26,11 +31,8 @@ private:
     sf::Sprite backgroundSprite;
     int startIndex = 0;
     int destIndex = 1;
-    bool useDijkstra = true;
     int fieldSelection = 0;
     routePlanner* routePlannerPtr;
 };
 
-
-
-#endif //GUI_H
+#endif // GUI_H

@@ -117,6 +117,57 @@ void routePlanner::dijkstra() {
     }
 }
 
+// BellmanFord Algorith
+void routePlanner::bellmanFord() {
+    parent.clear();
+    distance.clear();
+
+    // Step 1: initialize graph
+    for (const auto& v : *graph->getVertices()) {
+        distance[v.first] = std::numeric_limits<double>::max();
+        parent[v.first] = -1;
+    }
+    distance[source] = 0;
+
+    int V = graph->getVertices()->size();
+
+
+    for (int i = 1; i < V; ++i) {
+        bool updated = false;
+        for (const auto& u : *graph->getVertices()) {
+            int uID = u.first;
+            auto listPtr = graph->getAdjacencyList(uID);
+            while (listPtr != nullptr) {
+                int vID = listPtr->getValue().to();
+                double weight = graph->getEdgeData(uID, vID);
+                if (distance[uID] != std::numeric_limits<double>::max() &&
+                    distance[vID] > distance[uID] + weight) {
+                    distance[vID] = distance[uID] + weight;
+                    parent[vID] = uID;
+                    updated = true;
+                    }
+                listPtr = listPtr->getNext();
+            }
+        }
+        if (!updated) break; // Exit
+    }
+
+    for (const auto& u : *graph->getVertices()) {
+        int uID = u.first;
+        auto listPtr = graph->getAdjacencyList(uID);
+        while (listPtr != nullptr) {
+            int vID = listPtr->getValue().to();
+            double weight = graph->getEdgeData(uID, vID);
+            if (distance[uID] != std::numeric_limits<double>::max() &&
+                distance[vID] > distance[uID] + weight) {
+                std::cerr << "Graph contains a negative-weight cycle." << std::endl;
+                return;
+                }
+            listPtr = listPtr->getNext();
+        }
+    }
+}
+
 // A* algorithm
 void routePlanner::aStar() {
     struct Node {

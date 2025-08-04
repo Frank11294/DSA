@@ -28,6 +28,8 @@ public:
 
     void setDest(int dest);
 
+    void bellmanFord();
+
     void dijkstra();
 
     void aStar();
